@@ -1,18 +1,21 @@
-import express from "express"
-import cors from "cors"
-import mongoose from "mongoose"
+const express = require("express");
+const cors = require("cors");
+const mongoose = require("mongoose");
+const connectDatabase = require("./config/database");
+const dotenv = require("dotenv");
+// import bodyParser from "body-parser"
 
 const app = express()
+// app.use(bodyParser.json()); 
+// app.use(bodyParser.urlencoded())
 app.use(express.json())
-app.use(express.urlencoded())
+// app.use(express.urlencoded())
 app.use(cors())
-
-mongoose.connect("mongodb://localhost:27017/myLoginRegisterDB", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-}, () => {
-    console.log("DB connected")
+dotenv.config({
+    path:"./config/config.env",
 })
+
+connectDatabase();
 
 const userSchema = new mongoose.Schema({
     name: String,
@@ -63,6 +66,17 @@ app.post("/register", (req, res)=> {
     
 }) 
 
-app.listen(9002,() => {
-    console.log("BE started at port 9002")
-});
+
+app.listen(process.env.PORT,async()=>{
+    try
+        {
+            await connect();
+        }
+    catch(err)
+        {
+            console.log({err:err.message})
+        }
+
+    console.log(`listening on port ${process.env.PORT}`)
+
+})
